@@ -5,7 +5,8 @@
 - **Surse:** Sentinel-2 (optic), Sentinel-1 (radar, util când e înnorat).
 - **Platforme:** Google Earth Engine și/sau openEO.
 - **Mască de nori:** Cloud Score+.
-- **Ieșiri:** poligoane de parcuri solare și stadiul construcției pe date.
+- **Ieșiri:** pentru fiecare proiect, stadiul pe date (`neînceput`, `în construcție`, `construit`, `nesigur`), data defrișării și data apariției modulelor, MWp estimat din suprafața panourilor și jurnalul de dovezi (data imaginii, produs, tile).
+- **Zone:** TRACK (Dolj, Gorj: Tismana, Rovinari, Ișalnița) și CHECK (Dâmbovița, Giurgiu: Văcărești, Titu).
 
 Structură:
 
