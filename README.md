@@ -22,8 +22,6 @@ Un sistem care urmărește parcurile fotovoltaice din România din imagini satel
 | [`validare/`](validare/) | Setul de adevăr și validarea | 30 de proiecte cartate manual, legate de ATR-uri, metrici de validare |
 | [`docs/`](docs/) | toată echipa | arhitectură, decizii, note de întâlnire |
 
-Discuțiile generale au loc pe canalul **General**, nu în repo.
-
 ## Cum lucrăm
 
 - Fiecare echipă lucrează în folderul ei. Schimbările în folderele altor echipe trec prin pull request cu review de la echipa respectivă.
@@ -35,8 +33,8 @@ Discuțiile generale au loc pe canalul **General**, nu în repo.
 ## Pornire rapidă
 
 ```bash
-git clone https://github.com/inundra/<nume-repo>.git
-cd <nume-repo>
+git clone https://github.com/inundra/solar-tracker.git
+cd solar-tracker
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 ```
