@@ -7,6 +7,7 @@ Baza de date PostgreSQL + PostGIS cu:
 - **ATR-uri** (avize tehnice de racordare): putere, nod de racordare, dată, stadiu.
 - **Companii**: denumire, CUI.
 - **Amplasamente**: geometrie (poligon / punct), UAT, județ.
+- **CfD și tranzacții**: rezultatele licitațiilor CfD și tranzacțiile cunoscute (vânzări de proiecte, finanțări).
 - **Legături** între ATR, companie și amplasament.
 
 Structură:
