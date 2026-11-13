@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-11-14 · P0 · Scaffold, leakage test, logging helper
+- **Done:** `src/` package with `log.py` (`setup_logging(site)`: console INFO + `data/logs/<site>_<ts>.log` DEBUG, utf-8) and a minimal `run.py` (`--site`, `--dry`, `--refresh`; logs the params hash). Added `tests/` (`test_no_leakage.py`, `test_log.py`), `pytest.ini` (marker `ee`, deselected by default), and `pipeline/.gitignore` (`data/`, `outputs/`). Reworded the comment in `config/sites*.yaml` that named the ground-truth folder.
+- **Why:** P0 is the base every later task uses. The leakage test enforces hard rule 1, and it scans raw text, so the warning comment in the config files would have tripped it. Rewording the comment keeps the test strict.
+- **Result:** `pytest -q` gives 3 passed. A planted `../validare/` string in `src/` makes the leakage test fail, as it should. `python -m src.run --site tismana_1 --dry` wrote `data/logs/tismana_1_20261114-013228.log` (params_hash=6ca723b715a6). No EE call.
+- **Not checked / risks:** branched from `pipeline/agent-workflow`, not `main`, because the kit is not merged yet. The PR must go after (or on top of) that branch. The `ee` marker is deselected by default via `addopts`, so run EE tests with `pytest -m ee`. Python 3.14 + pytest 9.2 on this machine.
+- **Next:** P1 (`ee_client.py`, `sites.py`, `--dry` prints AOI area).
+- **Commit:** pipeline/p0-scaffold
+
 ## 2026-11-14 · setup · Titu AOI corrected
 - **Done:** `titu` geometry moved from the block at ~25.59E 44.627N to the site at ~25.617E 44.611N (AOI 156 ha). Corrects the "EE auth + first AOIs" entry.
 - **Why:** S2 sequence 2024 → spring 2025 → autumn 2025 → spring 2026: the SE site was cropland in 2024, cleared spring 2025, panels by spring 2026 — matches Enery (construction Feb 2025, energised Mar 2026); one coherent ~60 ha array fits 54 MWp on single-axis trackers; inside Titu UAT, toward Potlogi (Enery's community area). The old pick is an older 2024 park plus 2025–26 extensions (~30 ha new), more consistent with Enexus "Titu 1" (20 MWp). A third new block at ~25.49E 44.62N is in Costeștii din Vale, not Titu.

@@ -1,6 +1,6 @@
 # Copy to sites.yaml and draw each AOI.
 # AOI = loose polygon around the park (fence + ~200 m buffer), drawn by the pipeline team
-# from a basemap. Do NOT copy panel polygons from validare/ (that's the ground truth).
+# from a basemap. Do NOT copy panel polygons from the ground-truth folder.
 # Coordinates: [lon, lat], EPSG:4326.
 
 sites:

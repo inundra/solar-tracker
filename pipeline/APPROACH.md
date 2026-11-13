@@ -1,6 +1,6 @@
 # Pipeline approach (living document)
 
-**Last updated:** 2026-11-14 · **by:** setup (agent kit) · **backlog at:** P0 not started
+**Last updated:** 2026-11-14 · **by:** P0 scaffold · **backlog at:** P0 done, P1 next
 
 > This file describes the approach **as it is right now**. Rewrite sections when the approach changes. Don't append history here; history goes in `LOG.md`.
 > Update it at the end of every task that changes *what* the pipeline does or *why*. Keep it readable in 5 minutes by a teammate who missed a week.

@@ -6,7 +6,7 @@ Status: `todo` / `doing` / `done` / `blocked(<reason>)`. Do items in order unles
 
 | ID | Status | Task | Done when |
 |---|---|---|---|
-| P0 | todo | Scaffold: `src/` package, `tests/`, `pytest.ini` (marker `ee`), `pipeline/.gitignore` with `data/` and `outputs/`, `tests/test_no_leakage.py` (fails if any file under `src/`, `labels/`, `config/` mentions `validare`), `src/log.py` (one `setup_logging(site)` helper: console INFO + `data/logs/` DEBUG file) | `pytest -q` green with the leakage test; a dry run writes a log file |
+| P0 | done | Scaffold: `src/` package, `tests/`, `pytest.ini` (marker `ee`), `pipeline/.gitignore` with `data/` and `outputs/`, `tests/test_no_leakage.py` (fails if any file under `src/`, `labels/`, `config/` mentions `validare`), `src/log.py` (one `setup_logging(site)` helper: console INFO + `data/logs/` DEBUG file) | `pytest -q` green with the leakage test; a dry run writes a log file (done: scaffold, leakage test, `src/log.py`, `run --dry` writes log) |
 | P1 | todo | `ee_client.py` + `sites.py`; `config/sites.yaml` from the example (geometry drawn by human) | `python -m src.run --site tismana_1 --dry` prints AOI area in ha; clear error when `EE_PROJECT` missing |
 | P2 | todo | `s2.py`: S2 SR harmonized + Cloud Score+ (`cs_cdf ≥ 0.60`), per-scene `clear_frac`, indices (NDVI, NDBI, BSI) | For one park and 3 months: table of scenes with clear_frac; spot-check 2 scenes visually in a notebook |
 | P3 | todo | `s1.py`: GRD IW VV/VH, single relative orbit, focal-median speckle filter, log-ratio vs baseline window | Same park: VV/VH series per date, orbit recorded |
