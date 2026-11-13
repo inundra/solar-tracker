@@ -5,7 +5,7 @@ description: Leave-one-park-out self-check of the MWitness pipeline on all parks
 
 1. Preflight as in `/pipeline-task` step 2 (EE auth is needed only if caches are missing or `--refresh` is used).
 2. For each park P in `config/sites.yaml`:
-   - fit the classifier and the MWp density factor on the **other 4 parks only**,
+   - fit the classifier and the MWp density factor on the **other 5 parks only**,
    - run `python -m src.run --site P` with that fit; confirm `provenance.held_out == true`.
 3. Compare against ground truth, **read-only**, from `../validare/proiecte_cartate/` (plus `reported_mwp` in `sites.yaml` for CHECK parks). This is the only place validare data may be read; never write the comparison back into `src/`, `labels/` or `config/`.
 4. Print one table:
