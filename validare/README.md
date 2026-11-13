@@ -2,6 +2,8 @@
 
 **Responsabil:** echipa Setul de adevăr și validarea
 
+- [`schema_csv.md`](schema_csv.md): formatul comun cu Date/Backend pentru `parcuri.csv` și `stadii_lunare.csv` (coloane, tipuri, valori de stadiu). Verificați fișierele cu `python validare/valideaza_csv.py validare/parcuri.csv validare/stadii_lunare.csv` înainte de commit.
+
 - `proiecte_cartate/`: 30 de proiecte cartate manual (GeoJSON), fiecare cu stadiul construcției pe date și legătura la ATR.
 - `rezultate/`: comparația dintre ieșirile pipeline-ului și setul de adevăr (IoU, precizie, recall, acuratețea stadiului, eroarea la date și eroarea MWp față de valorile raportate de dezvoltatori; ținta este ±8%).
 
