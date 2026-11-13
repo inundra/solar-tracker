@@ -1,0 +1,34 @@
+# Every threshold the pipeline uses. Changing a value that changes reported results
+# needs a note in docs/decizii/. Starting values are guesses to tune leave-one-park-out.
+
+seed: 42
+start_date: "2022-01-01"
+
+s2:
+  clear_threshold: 0.60     # Cloud Score+ cs_cdf, from project README
+  min_clear_frac: 0.80      # share of AOI pixels clear for a scene to count
+  scale_m: 10
+
+s1:
+  instrument_mode: IW
+  speckle_radius_m: 30      # focal median
+  baseline_days: 90         # window before the date used as reference
+  decisive_db: 1.5          # |log-ratio| above this counts as real change
+
+stage:
+  veg_drop: 0.40            # drop in vegetation fraction vs baseline
+  bare_min: 0.50
+  panel_min: 0.20
+  built_frac: 0.90          # of final panel plateau
+  confirm_n: 2              # consecutive clear observations to confirm an event
+  window_days: 45
+  min_obs_window: 2         # fewer clear S2 obs than this in the window → candidate for nesigur
+
+mwp:
+  density_mwp_per_ha: null  # [low, high], calibrated leave-one-park-out (P8)
+  dc_ac_ratio: [1.10, 1.40]
+  target_rel_error: 0.08    # ±8% goal from README
+
+classifier:
+  trees: 200
+  classes: [panel, bare, vegetation, other]

@@ -1,0 +1,56 @@
+# Copy to sites.yaml and draw each AOI.
+# AOI = loose polygon around the park (fence + ~200 m buffer), drawn by the pipeline team
+# from a basemap. Do NOT copy panel polygons from validare/ (that's the ground truth).
+# Coordinates: [lon, lat], EPSG:4326.
+
+sites:
+  # Tismana 1 and Tismana 2 are separate OMV Petrom/CE Oltenia parks (Parc Fotovoltaic Tismana 1 SA, Solarist Tismana 2 SA),
+  # on the Tismana I/II inner dumps near Rovinari (Câlnic commune area), not at Tismana town.
+  - id: tismana_1
+    name: Tismana 1
+    county: Gorj
+    role: TRACK
+    atr_id: null          # fill when backend links it
+    # Drawn 2026-11-14: official project point (parc-verde.ro, 2-decimal) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
+    geometry: [[[23.0669, 44.9458], [23.0785, 44.9475], [23.0889, 44.9441], [23.1050, 44.9423], [23.1056, 44.9302], [23.0946, 44.9302], [23.0773, 44.9320], [23.0669, 44.9389], [23.0669, 44.9458]]]
+  - id: tismana_2
+    name: Tismana 2
+    county: Gorj
+    role: TRACK
+    atr_id: null
+    # Drawn 2026-11-14: official project point (parc-verde.ro, 2-decimal) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
+    geometry: [[[23.1064, 44.9373], [23.1264, 44.9400], [23.1273, 44.9336], [23.1209, 44.9200], [23.1155, 44.9200], [23.1064, 44.9291], [23.1064, 44.9373]]]
+  - id: rovinari
+    name: Rovinari
+    county: Gorj
+    role: TRACK
+    atr_id: null
+    # Drawn 2026-11-14: no official point; 'Rovinari Est inner dump, NE of Rovinari, ~4.5 km from the power plant' (parc-verde.ro) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
+    geometry: [[[23.1736, 44.9255], [23.1900, 44.9224], [23.2036, 44.9200], [23.2036, 44.9118], [23.1882, 44.9136], [23.1736, 44.9191], [23.1736, 44.9255]]]
+  - id: isalnita
+    name: Ișalnița
+    county: Dolj
+    role: TRACK
+    atr_id: null
+    # Drawn 2026-11-14 from S2 summer 2024 vs 2026 composites: new panel grid on former CET Ișalnița grounds (OMV Petrom/CE Oltenia, ~90 MW). Under construction; verify fence on a basemap.
+    geometry: [[[23.7118, 44.3874], [23.7268, 44.3874], [23.7388, 44.3706], [23.7316, 44.3670], [23.7118, 44.3736], [23.7118, 44.3874]]]
+  - id: vacaresti
+    name: Văcărești
+    county: Dâmbovița       # DRI/DTEK park south of Târgoviște, Văcărești commune (Dâmbovița)
+    role: CHECK
+    atr_id: null
+    reported_mwp: 126     # developer-reported, with source URL; only for leave-one-park-out calibration/eval
+    reported_source: https://www.focus-energetic.ro/cea-mai-mare-companie-energetica-privata-din-ucraina-a-cumparat-un-parc-fotovoltaic-de-126-mw-in-dambovita-90114.html
+    # Drawn 2026-11-14 from S2 2024 vs 2026: single new ~2 km park, clear fence. High confidence.
+    geometry: [[[25.4979, 44.8325], [25.5132, 44.8298], [25.5285, 44.8181], [25.5141, 44.8104], [25.4970, 44.8257], [25.4979, 44.8325]]]
+  - id: titu
+    name: Titu
+    county: Dâmbovița
+    role: CHECK
+    atr_id: null
+    reported_mwp: 54.28   # Enery Titu, 54.28 MWp DC / 42.60 MWac
+    reported_source: https://www.energynomics.ro/en/enery-inaugurates-new-54-mw-pv-park-in-titu
+    # Drawn 2026-11-14 from S2 2024-2026 sequence: new single site on 2024 cropland, Titu UAT, toward Potlogi; cleared spring 2025,
+    # panels by spring 2026 (matches Enery: construction Feb 2025, energised Mar 2026), ~60 ha (fits 54 MWp on trackers).
+    # NOT the block at ~25.59,44.627 (older park + 2025-26 extensions, likely Enexus "Titu 1" 20 MWp). Small PV-roofed farm buildings sit inside the E buffer.
+    geometry: [[[25.6069, 44.6089], [25.6191, 44.6180], [25.6227, 44.6177], [25.6258, 44.6141], [25.6256, 44.6047], [25.6144, 44.6047], [25.6102, 44.6058], [25.6069, 44.6089]]]

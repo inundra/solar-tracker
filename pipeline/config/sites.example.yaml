@@ -1,0 +1,48 @@
+# Copy to sites.yaml and draw each AOI.
+# AOI = loose polygon around the park (fence + ~200 m buffer), drawn by the pipeline team
+# from a basemap. Do NOT copy panel polygons from validare/ (that's the ground truth).
+# Coordinates: [lon, lat], EPSG:4326.
+
+sites:
+  # Tismana 1 and Tismana 2 are separate OMV Petrom/CE Oltenia parks (Parc Fotovoltaic Tismana 1 SA, Solarist Tismana 2 SA),
+  # likely on the Tismana I/II lignite pits near Rovinari, not at Tismana town. Locations not yet confirmed.
+  - id: tismana_1
+    name: Tismana 1
+    county: Gorj
+    role: TRACK
+    atr_id: null          # fill when backend links it
+    geometry: null        # TODO: [[[lon, lat], ...]]
+  - id: tismana_2
+    name: Tismana 2
+    county: Gorj
+    role: TRACK
+    atr_id: null
+    geometry: null
+  - id: rovinari
+    name: Rovinari
+    county: Gorj
+    role: TRACK
+    atr_id: null
+    geometry: null
+  - id: isalnita
+    name: Ișalnița
+    county: Dolj
+    role: TRACK
+    atr_id: null
+    geometry: null
+  - id: vacaresti
+    name: Văcărești
+    county: Dâmbovița       # README lists Dâmbovița + Giurgiu for CHECK; confirm
+    role: CHECK
+    atr_id: null
+    reported_mwp: null    # developer-reported, with source URL; only for leave-one-park-out calibration/eval
+    reported_source: null
+    geometry: null
+  - id: titu
+    name: Titu
+    county: Dâmbovița
+    role: CHECK
+    atr_id: null
+    reported_mwp: null
+    reported_source: null
+    geometry: null
