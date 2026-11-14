@@ -12,7 +12,9 @@ def _close_log_handlers():
     logging.basicConfig(force=True, handlers=[logging.NullHandler()])  # releases the file on Windows
 
 
-def test_dry_run_writes_utf8_log_file(tmp_path):
+def test_dry_run_writes_utf8_log_file(tmp_path, monkeypatch):
+    monkeypatch.setattr("src.ee_client.init", lambda: None)  # offline: no EE
+    monkeypatch.setattr("src.sites.area_ha", lambda site: 1.0)
     main(["--site", "tismana_1", "--dry"], log_dir=tmp_path)
     logging.getLogger().info("stadiu: în construcție")
     files = list(tmp_path.glob("tismana_1_*.log"))

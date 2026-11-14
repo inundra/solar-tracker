@@ -4,6 +4,7 @@ import hashlib
 import logging
 from pathlib import Path
 
+from src import ee_client, sites
 from src.log import LOG_DIR, setup_logging
 
 PARAMS = Path(__file__).resolve().parents[1] / "config" / "params.yaml"
@@ -13,15 +14,26 @@ log = logging.getLogger(__name__)
 def main(argv=None, log_dir: Path = LOG_DIR) -> None:
     ap = argparse.ArgumentParser(prog="src.run")
     ap.add_argument("--site", required=True)
-    ap.add_argument("--dry", action="store_true", help="set up and log, touch no data")
+    ap.add_argument("--dry", action="store_true", help="init EE and report the AOI, extract no data")
     ap.add_argument("--refresh", action="store_true", help="re-extract instead of using cache")
     args = ap.parse_args(argv)
+    try:
+        site = sites.get(args.site)  # before logging: the id becomes part of the log file name
+    except KeyError as e:
+        ap.error(str(e))
+    try:
+        project = ee_client.init()  # before logging: a failed start leaves no empty log
+    except RuntimeError as e:
+        raise SystemExit(str(e))
 
     path = setup_logging(args.site, log_dir)
-    log.info("site=%s dry=%s refresh=%s log=%s", args.site, args.dry, args.refresh, path)
+    log.info("site=%s (%s, %s) dry=%s refresh=%s log=%s",
+             site["id"], site["name"], site["role"], args.dry, args.refresh, path)
     log.info("params_hash=%s", hashlib.sha256(PARAMS.read_bytes()).hexdigest()[:12])
+    log.info("ee_project=%s", project)
+    log.info("aoi_area_ha=%.1f", sites.area_ha(site))
     if args.dry:
-        log.info("dry run: stopping before any Earth Engine call")
+        log.info("dry run: stopping before data extraction")
         return
     raise SystemExit("only --dry is implemented so far (P1+)")
 

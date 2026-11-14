@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-11-14 · P1 · EE client and site loader
+- **Done:** `src/ee_client.py` (`init()`: project from `EE_PROJECT`, clear errors for unset / not authenticated); `src/sites.py` (`load`, `get`, `aoi` → `ee.Geometry.Polygon`, `area_ha`). `run.py --dry` now validates `--site` against `sites.yaml` before logging, initialises EE, logs project and AOI area, stops before extraction. Tests: `tests/test_sites.py` (4 offline + 1 `ee`); `test_log.py` stubs EE.
+- **Why:** P1 "done when". Validating the id first stops `--site ../x` from writing logs outside `data/logs/` (P0 reviewer advisory). Geometry stays raw in `sites.py` so loading is testable offline.
+- **Result:** `pytest -q` 7 passed; `pytest -m ee` 1 passed. Dry run AOI areas (ha): tismana_1 434.0, tismana_2 265.4, rovinari 216.1, isalnita 328.5, vacaresti 311.6, titu 155.6; same as the setup entries. Run log: `data/logs/tismana_1_20261114-020947.log`. `EE_PROJECT` unset → "EE_PROJECT is not set: run `setx EE_PROJECT ...`"; unknown site → argparse error listing valid ids.
+- **Not checked / risks:** earthengine-api lives only in the repo-root `.venv` (system Python lacks it); run with `..\.venv\Scripts\python.exe`. Auth-failure message not tested live (would need revoking credentials).
+- **Next:** P2 (S2 + Cloud Score+, per-scene clear_frac).
+- **Commit:** pipeline/agent-workflow
+
 ## 2026-11-14 · docs · Pipeline README now English, merged with kit README
 - **Done:** replaced the Romanian `README.md` with the kit's English README, adapted for the repo (layout, setup, run, agent use, records, workflow), and carried over the Romanian facts (owner, sources, platform, cloud mask, outputs, study areas, structure, no keys in git). `CLAUDE.md` language rule and P15 updated to match. `check-run` skill now fits on the other 5 parks (commit 0ce58bd).
 - **Why:** human decision: one README in the pipeline folder; the kit README lived only on the desktop, so teammates never saw how to use the agent.
