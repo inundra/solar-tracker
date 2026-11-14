@@ -16,7 +16,8 @@ from src.log import setup_logging
 
 S1 = "COPERNICUS/S1_GRD"
 ROW = ["date", "system_index", "orbit", "platform", "pass", "vv_sum", "vv_count", "vh_sum", "vh_count", "cover_frac"]
-OUT = ["date", "system_index", "orbit", "platform", "pass", "n_slices", "cover_frac", "vv_db", "vh_db", "vv_lr", "vh_lr"]
+OUT = ["date", "system_index", "orbit", "platform", "pass", "n_slices", "cover_frac", "obs",
+       "vv_db", "vh_db", "vv_lr", "vh_lr"]
 log = logging.getLogger(__name__)
 
 
@@ -31,8 +32,10 @@ def collection(aoi, start: str, end: str, p: dict, orbit: int | None = None):
 
 
 def orbit_counts(aoi, start: str, end: str, p: dict):
-    """ee.Dictionary {relative orbit: scene count}."""
-    return collection(aoi, start, end, p).aggregate_histogram("relativeOrbitNumber_start")
+    """ee.Dictionary {relative orbit: number of distinct dates}. Dates, not scenes: an AOI cut by a slice
+    boundary gives two scenes per pass and would otherwise win the pick."""
+    col = collection(aoi, start, end, p).map(lambda img: img.set("d", img.date().format("YYYY-MM-dd")))
+    return col.distinct(["relativeOrbitNumber_start", "d"]).aggregate_histogram("relativeOrbitNumber_start")
 
 
 def pick_orbit(counts: dict) -> int:
@@ -68,7 +71,7 @@ def scene_rows(aoi, start: str, end: str, orbit: int, p: dict):
     return ee.FeatureCollection(collection(aoi, start, end, p, orbit).map(row))
 
 
-def to_frame(fc: dict, baseline_days: int) -> pd.DataFrame:
+def to_frame(fc: dict, baseline_days: int, min_cover_frac: float) -> pd.DataFrame:
     """getInfo() result → one row per date: VV/VH in dB and log-ratio (dB) vs the mean of the previous
     `baseline_days` (window [t - baseline_days, t), linear power). No earlier data → NaN."""
     raw = pd.DataFrame([f["properties"] for f in fc["features"]], columns=ROW)
@@ -84,11 +87,13 @@ def to_frame(fc: dict, baseline_days: int) -> pd.DataFrame:
         n_slices=("system_index", "size"), cover_frac=("cover_frac", "sum"),
         vv_sum=("vv_sum", "sum"), vv_count=("vv_count", "sum"), vh_sum=("vh_sum", "sum"), vh_count=("vh_count", "sum"))
     g["cover_frac"] = g["cover_frac"].clip(upper=1.0)
+    ok = (g["cover_frac"] >= min_cover_frac).to_numpy()  # a partial pass sees a different area: not comparable
+    g["obs"] = ok
     for b in ("vv", "vh"):
         lin = pd.Series((g[f"{b}_sum"] / g[f"{b}_count"]).to_numpy(), index=g["date"])
-        base = lin.rolling(f"{baseline_days}D", closed="left").mean()
+        base = lin.where(ok).rolling(f"{baseline_days}D", closed="left").mean()
         g[f"{b}_db"] = 10 * np.log10(lin.to_numpy())
-        g[f"{b}_lr"] = 10 * np.log10(lin.to_numpy() / base.to_numpy())
+        g[f"{b}_lr"] = np.where(ok, 10 * np.log10(lin.to_numpy() / base.to_numpy()), np.nan)
     return g[OUT]
 
 
@@ -111,11 +116,12 @@ def main(argv=None) -> pd.DataFrame:
     log.info("collection=%s mode=%s range=[%s, %s) speckle_radius_m=%s baseline_days=%s", S1,
              p["s1"]["instrument_mode"], args.start, args.end, p["s1"]["speckle_radius_m"], p["s1"]["baseline_days"])
     counts = orbit_counts(aoi, args.start, args.end, p).getInfo()
-    orbit = pick_orbit(counts)
-    log.info("orbit_counts=%s chosen_orbit=%d (most scenes, ties -> lowest)", counts, orbit)
-    df = to_frame(scene_rows(aoi, args.start, args.end, orbit, p).getInfo(), p["s1"]["baseline_days"])
-    log.info("dates=%d multi_slice_dates=%d min_cover=%.3f", len(df), int((df["n_slices"] > 1).sum()),
-             df["cover_frac"].min() if len(df) else float("nan"))
+    orbit = site.get("s1_orbit") or pick_orbit(counts)  # fixed per site in sites.yaml; pick only if unset
+    log.info("orbit_counts(dates)=%s orbit=%d (%s)", counts, orbit, "sites.yaml" if site.get("s1_orbit") else "picked")
+    df = to_frame(scene_rows(aoi, args.start, args.end, orbit, p).getInfo(),
+                  p["s1"]["baseline_days"], p["s1"]["min_cover_frac"])
+    log.info("dates=%d obs=%d multi_slice_dates=%d min_cover=%.3f", len(df), int(df["obs"].sum()),
+             int((df["n_slices"] > 1).sum()), df["cover_frac"].min() if len(df) else float("nan"))
     log.info("\n%s", df.to_string(index=False, float_format="%.2f"))
     return df
 

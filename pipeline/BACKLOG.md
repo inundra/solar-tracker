@@ -10,7 +10,7 @@ Status: `todo` / `doing` / `done` / `blocked(<reason>)`. Do items in order unles
 | P1 | done | `ee_client.py` + `sites.py`; `config/sites.yaml` from the example (geometry drawn by human) | `python -m src.run --site tismana_1 --dry` prints AOI area in ha; clear error when `EE_PROJECT` missing (done: `--dry` logs AOI ha for all 6 sites; unknown id rejected) |
 | P2 | done | `s2.py`: S2 SR harmonized + Cloud Score+ (`cs_cdf ≥ 0.60`), per-scene `clear_frac`, indices (NDVI, NDBI, BSI) | For one park and 3 months: table of scenes with clear_frac; spot-check 2 scenes visually in a notebook (done: Tismana 1 Aug–Oct 2026, 55 scenes / 40 obs; notebook `p2_s2_spotcheck.ipynb`) |
 | P3 | done | `s1.py`: GRD IW VV/VH, single relative orbit, focal-median speckle filter, log-ratio vs baseline window | Same park: VV/VH series per date, orbit recorded (done: Tismana 1 May–Oct 2026, orbit 7, 34 dates) |
-| P4 | todo | `extract.py`: one server-side FeatureCollection → `data/timeseries/<site>.csv`; cached, `--refresh` to redo | All 6 parks extracted 2022-01-01 → today; one `getInfo`/export per site; small fixture CSV saved under `tests/fixtures/` |
+| P4 | done | `extract.py`: one server-side FeatureCollection → `data/timeseries/<site>.csv`; cached, `--refresh` to redo | All 6 parks extracted 2022-01-01 → today; one `getInfo`/export per site; small fixture CSV saved under `tests/fixtures/` (done: 6 sites 2022-01-01 → 2026-11-13, one getInfo each, fixture 14 KB; orbit fixed per site) |
 
 ## Week 3 (21–27 Nov): stage, dates, MWp
 

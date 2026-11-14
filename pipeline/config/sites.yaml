@@ -10,6 +10,7 @@ sites:
     name: Tismana 1
     county: Gorj
     role: TRACK
+    s1_orbit: 7         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (7:200 29:199 102:198 80:198); ties -> lowest
     atr_id: null          # fill when backend links it
     # Drawn 2026-11-14: official project point (parc-verde.ro, 2-decimal) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
     geometry: [[[23.0669, 44.9458], [23.0785, 44.9475], [23.0889, 44.9441], [23.1050, 44.9423], [23.1056, 44.9302], [23.0946, 44.9302], [23.0773, 44.9320], [23.0669, 44.9389], [23.0669, 44.9458]]]
@@ -17,6 +18,7 @@ sites:
     name: Tismana 2
     county: Gorj
     role: TRACK
+    s1_orbit: 7         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (7:200 29:199 102:198 80:198); ties -> lowest
     atr_id: null
     # Drawn 2026-11-14: official project point (parc-verde.ro, 2-decimal) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
     geometry: [[[23.1064, 44.9373], [23.1264, 44.9400], [23.1273, 44.9336], [23.1209, 44.9200], [23.1155, 44.9200], [23.1064, 44.9291], [23.1064, 44.9373]]]
@@ -24,6 +26,7 @@ sites:
     name: Rovinari
     county: Gorj
     role: TRACK
+    s1_orbit: 7         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (7:200 29:199 102:198 80:198); ties -> lowest
     atr_id: null
     # Drawn 2026-11-14: no official point; 'Rovinari Est inner dump, NE of Rovinari, ~4.5 km from the power plant' (parc-verde.ro) + S2 NDVI loss 2024 -> Aug-Nov 2026 (dump levelling, no panels yet; commissioning planned 2027). Medium confidence on extent.
     geometry: [[[23.1736, 44.9255], [23.1900, 44.9224], [23.2036, 44.9200], [23.2036, 44.9118], [23.1882, 44.9136], [23.1736, 44.9191], [23.1736, 44.9255]]]
@@ -31,6 +34,7 @@ sites:
     name: Ișalnița
     county: Dolj
     role: TRACK
+    s1_orbit: 7         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (7:200 102:199 29:198 80:198); ties -> lowest
     atr_id: null
     # Drawn 2026-11-14 from S2 summer 2024 vs 2026 composites: new panel grid on former CET Ișalnița grounds (OMV Petrom/CE Oltenia, ~90 MW). Under construction; verify fence on a basemap.
     geometry: [[[23.7118, 44.3874], [23.7268, 44.3874], [23.7388, 44.3706], [23.7316, 44.3670], [23.7118, 44.3736], [23.7118, 44.3874]]]
@@ -38,6 +42,7 @@ sites:
     name: Văcărești
     county: Dâmbovița       # DRI/DTEK park south of Târgoviște, Văcărești commune (Dâmbovița)
     role: CHECK
+    s1_orbit: 131         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (131:202 109:200 7:200 29:198 36:1); ties -> lowest
     atr_id: null
     reported_mwp: 126     # developer-reported, with source URL; only for leave-one-park-out calibration/eval
     reported_source: https://www.focus-energetic.ro/cea-mai-mare-companie-energetica-privata-din-ucraina-a-cumparat-un-parc-fotovoltaic-de-126-mw-in-dambovita-90114.html
@@ -47,6 +52,7 @@ sites:
     name: Titu
     county: Dâmbovița
     role: CHECK
+    s1_orbit: 131         # fixed 2026-11-14: most distinct dates 2022-01-01..2026-11-14 (131:202 109:200 7:200 29:198 36:1); ties -> lowest
     atr_id: null
     reported_mwp: 54.28   # Enery Titu, 54.28 MWp DC / 42.60 MWac
     reported_source: https://www.energynomics.ro/en/enery-inaugurates-new-54-mw-pv-park-in-titu

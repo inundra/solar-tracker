@@ -14,6 +14,7 @@ s1:
   speckle_radius_m: 30      # focal median
   baseline_days: 90         # window before the date used as reference
   decisive_db: 1.5          # |log-ratio| above this counts as real change
+  min_cover_frac: 0.95      # share of AOI a pass must cover to count as an S1 observation (decided 2026-11-14)
 
 stage:
   veg_drop: 0.40            # drop in vegetation fraction vs baseline

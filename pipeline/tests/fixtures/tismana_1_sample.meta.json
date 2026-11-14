@@ -1,0 +1,17 @@
+{
+ "site_id": "tismana_1",
+ "date_range": [
+  "2026-08-01",
+  "2026-11-01"
+ ],
+ "end_exclusive": true,
+ "collections": [
+  "COPERNICUS/S2_SR_HARMONIZED",
+  "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED",
+  "COPERNICUS/S1_GRD"
+ ],
+ "s1_orbit": 7,
+ "params_hash": "c19f48f4bb59",
+ "extracted_at": "2026-11-14T00:51:56+00:00",
+ "note": "slice of the full 2022-> extraction; S1 lr uses the full-history baseline"
+}
