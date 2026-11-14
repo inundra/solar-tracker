@@ -1,13 +1,11 @@
 """CLI entry: python -m src.run --site <id> [--dry] [--refresh]. Stages are wired in from P1 on."""
 import argparse
-import hashlib
 import logging
 from pathlib import Path
 
-from src import ee_client, sites
+from src import ee_client, params, sites
 from src.log import LOG_DIR, setup_logging
 
-PARAMS = Path(__file__).resolve().parents[1] / "config" / "params.yaml"
 log = logging.getLogger(__name__)
 
 
@@ -29,7 +27,7 @@ def main(argv=None, log_dir: Path = LOG_DIR) -> None:
     path = setup_logging(args.site, log_dir)
     log.info("site=%s (%s, %s) dry=%s refresh=%s log=%s",
              site["id"], site["name"], site["role"], args.dry, args.refresh, path)
-    log.info("params_hash=%s", hashlib.sha256(PARAMS.read_bytes()).hexdigest()[:12])
+    log.info("params_hash=%s", params.hash_())
     log.info("ee_project=%s", project)
     log.info("aoi_area_ha=%.1f", sites.area_ha(site))
     if args.dry:

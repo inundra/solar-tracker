@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-11-14 · P2 · Sentinel-2 + Cloud Score+ per-scene rows
+- **Done:** `src/s2.py`: S2 SR harmonized linked to Cloud Score+ `cs_cdf`; per scene, server-side `reduceRegion(scale=10, maxPixels=1e9)`: `clear_frac` (share of AOI with `cs_cdf ≥ clear_threshold`, masked / off-footprint = not clear), mean NDVI / NDBI / BSI over clear pixels; `csp_frac` (AOI share with a Cloud Score+ value, separates missing CS+ from overcast); reductions on the scene's UTM grid (`crs` = B4 projection); date, `system:index`, `PRODUCT_ID`, `MGRS_TILE`. `to_frame()` (pure) flags `obs = clear_frac ≥ min_clear_frac`. `thumb_urls()` for spot-checks; CLI `python -m src.s2`. `src/params.py` (load + hash) used by `run.py` too. Notebook `notebooks/p2_s2_spotcheck.ipynb` (outputs stripped).
+- **Why:** P2 "done when". Counting no-data as not clear keeps a scene that only half-covers the AOI from looking clear. Indices only over clear pixels so cloud doesn't leak into them.
+- **Result:** Tismana 1, 2026-08-01 → 2026-11-01: 55 scenes (tile 34TFQ, orbits R093 + R136, S2A/B/C), 40 clear obs at 0.80, one `getInfo`. NDVI ~0.43 → ~0.30 and BSI 0.03 → 0.17 over the period (levelling continues). Spot-check (thumbnails viewed): 2026-09-07 clear 1.000, mask right; 2026-10-02 clear 0.421, haze in E half masked correctly; **2026-10-17 clear 0.916 but thin haze over the whole scene, NDVI 0.21 vs ~0.37 neighbours: haze passes `cs_cdf ≥ 0.60`.** After reviewer fixes (UTM `crs`, `csp_frac`): unchanged 55 / 40, `no_cloudscore=0`, so the 7 scenes at clear 0.000 are real overcast. Also viewed 2026-10-07 (clear 1.000, NDVI 0.290: looks clear; farmland in the AOI's N part browned/ploughed since Sept) and 2026-10-09 (clear 1.000, NDVI 0.244: light haze, like 10-17). Run log: `data/logs/tismana_1_20261114-023048.log`. Tests: 10 offline + 2 `ee` passed.
+- **Not checked / risks:** haze leak above, left as is (changing `clear_threshold` changes results → human decision; `confirm_n = 2` in P7 should absorb single dips). The AOI buffer includes farmland whose seasonal change moves NDVI without construction; class fractions (P6) restricted to the AOI should matter more than whole-AOI index means. Same-day duplicates exist (two satellites / orbits on one date, e.g. 2026-08-05); P4/P7 must decide whether to merge them. Only one park checked; other tiles not seen yet.
+- **Next:** P3 (S1 VV/VH, single relative orbit).
+- **Commit:** pipeline/agent-workflow
+
 ## 2026-11-14 · cleanup · Reviewer advisories and doc drift
 - **Done:** leakage test also flags `proiecte_cartate` (the GT subfolder), not only `validare`; `CLAUDE.md` `sites.py` line now says geometry stays raw and `aoi()` builds the `ee.Geometry`. Desktop kit re-synced; its README marks install steps 1–3 done.
 - **Why:** P0/P1 reviewer advisories that need no teammate input. CLAUDE.md described an API the code doesn't have.
