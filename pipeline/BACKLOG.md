@@ -37,7 +37,7 @@ Status: `todo` / `doing` / `done` / `blocked(<reason>)`. Do items in order unles
 | ID | Status | Task | Done when |
 |---|---|---|---|
 | P14 | todo | Freeze params; run all sites; export final outputs for backend import | Outputs carry the commit hash in `provenance` |
-| P15 | todo | Update `pipeline/README.md` (Romanian, short): how to run, what each output field means | Teammate can run one site from scratch following it |
+| P15 | todo | Update `pipeline/README.md` (English, short): add what each output field means; setup and run steps already there | Teammate can run one site from scratch following it |
 
 ## Later (not before 11 Dec)
 

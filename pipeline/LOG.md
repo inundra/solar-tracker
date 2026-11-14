@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-11-14 · docs · Pipeline README now English, merged with kit README
+- **Done:** replaced the Romanian `README.md` with the kit's English README, adapted for the repo (layout, setup, run, agent use, records, workflow), and carried over the Romanian facts (owner, sources, platform, cloud mask, outputs, study areas, structure, no keys in git). `CLAUDE.md` language rule and P15 updated to match. `check-run` skill now fits on the other 5 parks (commit 0ce58bd).
+- **Why:** human decision: one README in the pipeline folder; the kit README lived only on the desktop, so teammates never saw how to use the agent.
+- **Result:** no run.
+- **Not checked / risks:** the team README changed language; the other pipeline team members haven't seen it yet. Giurgiu CHECK park still open (APPROACH § 5).
+- **Next:** P1.
+- **Commit:** pipeline/agent-workflow
+
 ## 2026-11-14 · P0 · Scaffold, leakage test, logging helper
 - **Done:** `src/` package with `log.py` (`setup_logging(site)`: console INFO + `data/logs/<site>_<ts>.log` DEBUG, utf-8) and a minimal `run.py` (`--site`, `--dry`, `--refresh`; logs the params hash). Added `tests/` (`test_no_leakage.py`, `test_log.py`), `pytest.ini` (marker `ee`, deselected by default), and `pipeline/.gitignore` (`data/`, `outputs/`). Reworded the comment in `config/sites*.yaml` that named the ground-truth folder.
 - **Why:** P0 is the base every later task uses. The leakage test enforces hard rule 1, and it scans raw text, so the warning comment in the config files would have tripped it. Rewording the comment keeps the test strict.

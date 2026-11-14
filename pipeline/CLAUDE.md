@@ -1,6 +1,6 @@
 # Pipeline agent brief (MWitness / solar-tracker)
 
-You work on `pipeline/` only. Read this file fully before any task, then `APPROACH.md` (what we do now and why) and the top 3 entries of `LOG.md` (what happened recently). Repo docs are in Romanian; code, comments and commit messages are in English.
+You work on `pipeline/` only. Read this file fully before any task, then `APPROACH.md` (what we do now and why) and the top 3 entries of `LOG.md` (what happened recently). Repo-wide docs are in Romanian; `pipeline/` docs (README included), code, comments and commit messages are in English.
 
 ## Records you keep (part of every task, not optional)
 
