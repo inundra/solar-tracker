@@ -44,7 +44,7 @@ Earth Engine extracts numbers. Pure Python decides. Keep that split.
 ```
 src/
   ee_client.py     init(): ee.Initialize(project=os.environ["EE_PROJECT"]); clear error if unset/unauthenticated
-  sites.py         load config/sites.yaml → list of {id, name, role, county, geometry(ee.Geometry)}
+  sites.py         load config/sites.yaml → list of {id, name, role, county, geometry ([lon, lat] rings)}; aoi(site) → ee.Geometry, area_ha(site)
   s2.py            S2 SR harmonized + Cloud Score+ link, mask cs_cdf >= params, indices (NDVI, NDBI, BSI)
   s1.py            S1 GRD IW VV+VH, single relative orbit per site, speckle filter, log-ratio vs baseline
   extract.py       per site × per scene → one row: date, product, system:index, clear_frac, class fractions, indices, VV/VH

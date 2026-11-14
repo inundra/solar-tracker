@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-11-14 · cleanup · Reviewer advisories and doc drift
+- **Done:** leakage test also flags `proiecte_cartate` (the GT subfolder), not only `validare`; `CLAUDE.md` `sites.py` line now says geometry stays raw and `aoi()` builds the `ee.Geometry`. Desktop kit re-synced; its README marks install steps 1–3 done.
+- **Why:** P0/P1 reviewer advisories that need no teammate input. CLAUDE.md described an API the code doesn't have.
+- **Result:** `pytest -q` 7 passed; a planted `proiecte_cartate/x` string in `src/` fails the leakage test as intended. No pipeline run.
+- **Not checked / risks:** `.claude/settings.json` still only allows `python -m pytest` / `python -m src.run`, not the `..\.venv` interpreter EE needs, so venv commands prompt; adding them was blocked by the permission classifier and is left to the human.
+- **Next:** P2.
+- **Commit:** pipeline/agent-workflow
+
 ## 2026-11-14 · P1 · EE client and site loader
 - **Done:** `src/ee_client.py` (`init()`: project from `EE_PROJECT`, clear errors for unset / not authenticated); `src/sites.py` (`load`, `get`, `aoi` → `ee.Geometry.Polygon`, `area_ha`). `run.py --dry` now validates `--site` against `sites.yaml` before logging, initialises EE, logs project and AOI area, stops before extraction. Tests: `tests/test_sites.py` (4 offline + 1 `ee`); `test_log.py` stubs EE.
 - **Why:** P1 "done when". Validating the id first stops `--site ../x` from writing logs outside `data/logs/` (P0 reviewer advisory). Geometry stays raw in `sites.py` so loading is testable offline.
