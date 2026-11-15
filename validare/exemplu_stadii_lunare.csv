@@ -1,0 +1,7 @@
+parc_id,luna,stadiu,sursa_imagine,data_imagine,id_imagine,verificat_de,note
+DJ-001,2025-01,teren_gol,sentinel-2,2025-01-19,,AlexandruAchilleF,
+DJ-001,2025-02,nesigur,,,,AlexandruAchilleF,nicio imagine fără nori
+DJ-001,2025-03,santier,sentinel-2,2025-03-14,,AlexandruAchilleF,teren nivelat și drumuri de șantier
+DJ-001,2025-04,santier,google-earth,2025-04-22,,AlexandruAchilleF,se văd piloni
+DJ-001,2025-05,panouri,sentinel-2,2025-05-28,,AlexandruAchilleF,cam 40% din suprafață
+DJ-001,2025-06,gata,sentinel-2,2025-06-30,,AlexandruAchilleF,
