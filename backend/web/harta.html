@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MWitness: aprobat vs construit</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root { --fundal: #f7f7f5; --text: #1d1d1b; --slab: #6b6b66; --linie: #ddddd8; --accent: #c2410c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text); background: var(--fundal); }
+  .pagina { display: grid; grid-template-columns: 360px 1fr; height: 100vh; }
+  aside { overflow-y: auto; padding: 16px; border-right: 1px solid var(--linie); background: #fff; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--slab); margin: 20px 0 8px; }
+  p.sub { margin: 0; color: var(--slab); }
+  #harta { height: 100%; }
+  .cifre { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .cifra { border: 1px solid var(--linie); border-radius: 6px; padding: 8px 10px; }
+  .cifra b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .cifra span { color: var(--slab); font-size: 12px; }
+  label { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+  input[type=search] { width: 100%; padding: 7px 9px; border: 1px solid var(--linie); border-radius: 6px; font: inherit; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { text-align: left; padding: 4px 4px; border-bottom: 1px solid var(--linie); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .leg { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; }
+  .leg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .eticheta { font-size: 11px; padding: 1px 6px; border-radius: 9px; background: #eee; white-space: nowrap; }
+  .leaflet-popup-content { font-size: 13px; }
+  .leaflet-popup-content table { font-size: 12px; }
+  .eroare { color: #b91c1c; }
+  @media (max-width: 760px) { .pagina { grid-template-columns: 1fr; grid-template-rows: 55vh auto; height: auto; }
+    #harta { height: 55vh; order: -1; } aside { border-right: 0; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <aside>
+    <h1>MWitness</h1>
+    <p class="sub">Ce s-a aprobat (ATR) față de ce se vede construit din satelit, pe județe.</p>
+    <div class="cifre">
+      <div class="cifra"><b id="c-aprobat">–</b><span>MW aprobați în ATR-uri</span></div>
+      <div class="cifra"><b id="c-construit">–</b><span>MWp construiți (detectați)</span></div>
+      <div class="cifra"><b id="c-santier">–</b><span>MWp în construcție</span></div>
+      <div class="cifra"><b id="c-detectii">–</b><span>detecții / legate de ATR</span></div>
+    </div>
+
+    <h2>Straturi</h2>
+    <label><input type="checkbox" id="s-judete" checked> Județe: cerc = MW aprobați, culoare = % vizibil pe teren</label>
+    <label><input type="checkbox" id="s-detectii" checked> Detecții (șantiere și parcuri)</label>
+    <label><input type="checkbox" id="s-parcuri" checked> Parcuri din setul de adevăr</label>
+    <div class="leg" style="margin-top:8px">
+      <span><i style="background:#9ca3af"></i>neînceput</span>
+      <span><i style="background:#f59e0b"></i>șantier</span>
+      <span><i style="background:#3b82f6"></i>panouri</span>
+      <span><i style="background:#16a34a"></i>gata</span>
+      <span><i style="background:#a855f7"></i>nesigur</span>
+    </div>
+
+    <h2>Caută ATR</h2>
+    <input type="search" id="cauta" placeholder="titular, nr. ATR, CUI sau cod județ (ex. DJ)">
+    <div id="rezultate"></div>
+
+    <h2>Județe</h2>
+    <table id="tabel-judete"><thead><tr><th>Județ</th><th class="n">Aprobat MW</th><th class="n">Construit MWp</th><th class="n">Șantier MWp</th></tr></thead><tbody></tbody></table>
+  </aside>
+  <div id="harta"></div>
+</div>
+<script>
+const CULORI = { teren_gol: "#9ca3af", santier: "#f59e0b", panouri: "#3b82f6", gata: "#16a34a", nesigur: "#a855f7" };
+const fmt = (x, z = 0) => x == null ? "–" : Number(x).toLocaleString("ro-RO", { maximumFractionDigits: z });
+const esc = s => String(s ?? "–").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const harta = L.map("harta", { preferCanvas: true }).setView([45.9, 25.0], 7);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19, attribution: "&copy; OpenStreetMap"
+}).addTo(harta);
+
+const straturi = { judete: L.layerGroup().addTo(harta), detectii: L.layerGroup().addTo(harta), parcuri: L.layerGroup().addTo(harta) };
+for (const [nume, strat] of Object.entries(straturi)) {
+  document.getElementById("s-" + nume).addEventListener("change", e => e.target.checked ? strat.addTo(harta) : strat.remove());
+}
+
+async function json(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r.json();
+}
+
+function culoareProcent(p) {
+  if (p == null) return "#d1d5db";
+  return p >= 50 ? "#16a34a" : p >= 20 ? "#84cc16" : p >= 5 ? "#f59e0b" : "#dc2626";
+}
+
+async function incarcaJudete() {
+  const fc = await json("/api/judete");
+  const tot = { aprobat: 0, construit: 0, santier: 0, detectii: 0, legate: 0 };
+  const tbody = document.querySelector("#tabel-judete tbody");
+  tbody.innerHTML = "";
+  for (const f of fc.features) {
+    const p = f.properties;
+    tot.aprobat += +p.mw_aprobat; tot.construit += +p.mwp_construit; tot.santier += +p.mwp_in_constructie;
+    tot.detectii += p.nr_detectii; tot.legate += p.nr_legate_de_atr;
+    const popup = `<b>${esc(p.nume)}</b> (${p.judet})<table>
+      <tr><td>ATR-uri</td><td class="n">${fmt(p.nr_atr)}</td></tr>
+      <tr><td>Aprobat</td><td class="n">${fmt(p.mw_aprobat)} MW</td></tr>
+      <tr><td>Construit (detectat)</td><td class="n">${fmt(p.mwp_construit, 1)} MWp</td></tr>
+      <tr><td>În construcție</td><td class="n">${fmt(p.mwp_in_constructie, 1)} MWp (${p.nr_santiere} șantiere)</td></tr>
+      <tr><td>Vizibil pe teren</td><td class="n">${p.procent_vizibil_pe_teren == null ? "–" : fmt(p.procent_vizibil_pe_teren, 1) + "%"}</td></tr>
+      <tr><td>Detecții legate de ATR</td><td class="n">${p.nr_legate_de_atr} / ${p.nr_detectii}</td></tr></table>`;
+    const culoare = culoareProcent(p.procent_vizibil_pe_teren);
+    if (f.geometry.type === "Point") {
+      if (+p.mw_aprobat > 0 || p.nr_detectii > 0) {
+        const raza = 6 + Math.sqrt(+p.mw_aprobat || 1) / 3;
+        L.circleMarker([p.lat, p.lon], { radius: raza, color: culoare, weight: 2, fillOpacity: .25 })
+          .bindPopup(popup).addTo(straturi.judete);
+      }
+    } else {
+      L.geoJSON(f, { style: { color: culoare, weight: 1, fillOpacity: .12 } }).bindPopup(popup).addTo(straturi.judete);
+    }
+    if (+p.mw_aprobat > 0 || p.nr_detectii > 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${esc(p.nume)}</td><td class="n">${fmt(p.mw_aprobat)}</td><td class="n">${fmt(p.mwp_construit, 1)}</td><td class="n">${fmt(p.mwp_in_constructie, 1)}</td>`;
+      tr.style.cursor = "pointer";
+      tr.onclick = () => harta.setView([p.lat, p.lon], 9);
+      tbody.appendChild(tr);
+    }
+  }
+  document.getElementById("c-aprobat").textContent = fmt(tot.aprobat);
+  document.getElementById("c-construit").textContent = fmt(tot.construit, 1);
+  document.getElementById("c-santier").textContent = fmt(tot.santier, 1);
+  document.getElementById("c-detectii").textContent = `${tot.detectii} / ${tot.legate}`;
+}
+
+async function incarcaDetectii() {
+  const fc = await json("/api/detectii");
+  L.geoJSON(fc, {
+    style: f => ({ color: CULORI[f.properties.stadiu_curent] || "#444", weight: 2, fillOpacity: .45 }),
+    onEachFeature: (f, strat) => {
+      const p = f.properties;
+      strat.bindPopup(`<b>${esc(p.detectie_id)}</b> <span class="eticheta">${esc(p.stadiu_produs)}</span><br>
+        ${esc(p.uat || "")} ${p.judet} · sursa ${esc(p.sursa)}<br>
+        ${fmt(p.suprafata_ha, 1)} ha · ${fmt(p.mwp, 1)} MWp (${fmt(p.mwp_min, 1)}–${fmt(p.mwp_max, 1)})<br>
+        defrișare ${esc(p.data_defrisare)} · panouri ${esc(p.data_module)}<br>
+        ATR: ${p.atr_id ? esc(p.atr_titular) + " (" + fmt(p.atr_mw, 1) + " MW)" : "nelegat"}<br>
+        <a href="/api/detectii/${encodeURIComponent(p.detectie_id)}/raport" target="_blank">raport de dovezi</a>`);
+    }
+  }).addTo(straturi.detectii);
+}
+
+async function incarcaParcuri() {
+  const fc = await json("/api/parcuri");
+  L.geoJSON(fc, {
+    pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 6, weight: 2, fillOpacity: .9 }),
+    style: f => ({ color: CULORI[f.properties.stadiu_curent] || "#444", weight: 2, dashArray: "4 3", fillOpacity: .2 }),
+    onEachFeature: (f, strat) => {
+      const p = f.properties;
+      strat.bindPopup(`<b>${esc(p.nume)}</b> (${p.parc_id}) <span class="eticheta">${esc(p.stadiu_produs)}</span><br>
+        ${esc(p.uat || "")} ${p.judet} · rol ${esc(p.rol)} · ${fmt(p.mwp, 1)} MWp<br>
+        verificat ${esc(p.data_verificare)}<br>
+        <a href="/api/parcuri/${encodeURIComponent(p.parc_id)}/raport" target="_blank">raport de dovezi</a>`);
+    }
+  }).addTo(straturi.parcuri);
+}
+
+let temporizare;
+document.getElementById("cauta").addEventListener("input", e => {
+  clearTimeout(temporizare);
+  temporizare = setTimeout(() => cautaAtr(e.target.value.trim()), 250);
+});
+
+async function cautaAtr(text) {
+  const div = document.getElementById("rezultate");
+  if (!text) { div.innerHTML = ""; return; }
+  const params = new URLSearchParams({ limit: 30 });
+  if (/^(ro)?\s*\d{2,10}$/i.test(text)) params.set("cui", text.replace(/\D/g, ""));
+  else if (/^[a-z]{1,2}$/i.test(text)) params.set("judet", text);
+  else params.set("q", text);
+  try {
+    const r = await json("/api/atr?" + params);
+    div.innerHTML = `<p class="sub">${r.total} ATR-uri, ${fmt(r.mw_total)} MW</p><table><thead><tr>
+      <th>Titular</th><th>Jud.</th><th class="n">MW</th><th>Pe teren</th></tr></thead><tbody>` +
+      r.rezultate.map(a => `<tr><td>${esc(a.titular)}<br><span class="sub">${esc(a.numar)}</span></td><td>${a.judet}</td>
+        <td class="n">${fmt(a.mw, 1)}</td><td>${a.detectie_id ? esc(a.stadiu_produs) : '<span class="sub">fără șantier legat</span>'}</td></tr>`).join("") +
+      "</tbody></table>";
+  } catch (err) { div.innerHTML = `<p class="eroare">${esc(err.message)}</p>`; }
+}
+
+Promise.all([incarcaJudete(), incarcaDetectii(), incarcaParcuri()]).catch(err => {
+  document.querySelector("aside").insertAdjacentHTML("beforeend", `<p class="eroare">Nu pot încărca datele: ${esc(err.message)}</p>`);
+});
+</script>
+</body>
+</html>

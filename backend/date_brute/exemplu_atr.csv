@@ -1,0 +1,5 @@
+numar_atr,data_atr,titular,cui,judet,mw,operator,etapa,data_pif,tehnologie,localitate,sursa,note
+1001/12.03.2023,2023-03-12,Exemplu Isalnita Solar SRL,RO 11111111,Dolj,"40,0",Distribuție Energie Oltenia,contract de racordare,12.2026,,,exemplu inventat,valori inventate pentru teste
+1002,2023-06-01,Alt Dezvoltator Energie SRL,22222222,DOLJ,120,Transelectrica,ATR,06.2027,fotovoltaic,,exemplu inventat,valori inventate pentru teste
+1003,2024-01-15,Baterii Sud BESS SRL,33333333,DJ,25,Distribuție Energie Oltenia,ATR,2027-03-01,,,exemplu inventat,valori inventate pentru teste
+2001,2022-11-20,Exemplu Tismana PV SRL,44444444,Gorj,15.5,Distribuție Energie Oltenia,contract de racordare,2026-09-01,,,exemplu inventat,valori inventate pentru teste
