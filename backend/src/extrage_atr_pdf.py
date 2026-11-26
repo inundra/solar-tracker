@@ -90,8 +90,20 @@ def extrage(pdf: Path) -> list[dict[str, str]]:
     except ImportError:
         raise SystemExit("Lipsește pdfplumber: pip install pdfplumber")
     with pdfplumber.open(pdf) as doc:
-        tabele = [t for pagina in doc.pages for t in pagina.extract_tables()]
+        tabele = [t for pagina in doc.pages for t in tabele_din_pagina(pagina)]
     return list(randuri_din_tabele(tabele))
+
+
+# Textul care trece peste marginea unei celule se amestecă, literă cu literă, cu textul celulei vecine
+# („OGlotrejnia” = „Gorj” + „Oltenia”), pentru că pdfplumber ordonează literele după poziție. Cu
+# use_text_flow, literele rămân în ordinea din PDF, deci fiecare text rămâne întreg („Gorj Oltenia S.A.)”),
+# iar importul găsește județul în el. dedupe_chars scoate literele dublate de textul îngroșat
+# („BBUUCCUURREESSTTII”).
+SETARI_TABEL = {"text_use_text_flow": True}
+
+
+def tabele_din_pagina(pagina) -> list:
+    return pagina.dedupe_chars().extract_tables(SETARI_TABEL)
 
 
 def main(argv: list[str]) -> int:
