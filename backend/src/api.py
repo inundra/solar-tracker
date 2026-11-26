@@ -138,7 +138,8 @@ def creeaza_app(dsn: str | None = None) -> FastAPI:
                   "st": stare_teren, "limit": limit, "offset": offset}
         total = interogare(f"SELECT count(*) AS n, coalesce(sum(mw), 0) AS mw FROM v_atr WHERE {filtru}", params)[0]
         randuri = interogare(
-            "SELECT id, numar, data_atr, titular, cui, judet, judet_nume, mw, operator, etapa, data_pif, tehnologie,"
+            "SELECT id, numar, data_atr, titular, cui, judet, judet_nume, judete_secundare, mw, operator, etapa,"
+            " data_pif, pif_text, stare_pif, an_pif, tehnologie, reparat,"
             " localitate, sursa, detectie_id, stare_teren, stadiu_produs, mwp_detectat, data_defrisare, data_module,"
             f" candidati FROM v_atr WHERE {filtru} ORDER BY mw DESC, id LIMIT %(limit)s OFFSET %(offset)s", params)
         return {"total": total["n"], "mw_total": total["mw"], "rezultate": randuri}

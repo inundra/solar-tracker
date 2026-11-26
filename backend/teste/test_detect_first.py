@@ -88,6 +88,70 @@ class TestFaraBaza(unittest.TestCase):
         self.assertEqual(leaga_atr.scor_loc("Titu", "Alt Dezvoltator SRL", None), 0.0)
 
 
+    def test_judete_scrise_in_lista_reala(self):
+        for v, coduri in [("Dambovta", ["DB"]), ("BISTRITA NASAU", ["BN"]), ("Caraș – Severin", ["CS"]),
+                          ("Timisoara", ["TM"]), ("ATIMIS", ["TM"]), ("BBUUCCUURREESSTTII", ["B"]),
+                          ("Arad si Timis", ["AR", "TM"]), ("Dâmbovița, Ilfov", ["DB", "IF"]),
+                          ("Gorj Oltenia S.A.)", ["GJ"]), ("Atlantida", [])]:
+            self.assertEqual(comun.judete_din_text(v), coduri, v)
+        self.assertIsNone(comun.cod_judet("Dambovta"))  # fără aproximativ=True rămâne strict
+
+    def test_pif_din_text(self):
+        from datetime import date
+        for v, asteptat in [
+            ("PIF estimat la 31.12.2027", ("estimat", date(2027, 12, 31), 2027)),
+            ("Pif estimat 2033", ("estimat", None, 2033)),
+            ("PIF/11.04.2012", ("realizat", date(2012, 4, 11), 2012)),
+            ("PIF 2014", ("realizat", None, 2014)),
+            ("Finalizat cu PIF", ("realizat", None, None)),
+            ("Anulat", ("anulat", None, None)),
+            ("retehnologizat", ("retehnologizat", None, None)),
+            ("PIF/03.06.2013(2.860 MW).", ("realizat", date(2013, 6, 3), 2013)),
+            ("PIF estimat la 31.06.2026", ("estimat", date(2026, 6, 30), 2026)),
+            ("12.2026", ("estimat", date(2026, 12, 1), 2026)),
+            ("", (None, None, None)),
+        ]:
+            self.assertEqual(comun.pif(v), asteptat, v)
+
+    def test_cui_si_mw_murdare(self):
+        self.assertEqual(comun.cui_tolerant("L. 45427207"), ("45427207", True))
+        self.assertEqual(comun.cui_tolerant("ROMANIA SRL 22160860"), ("22160860", True))
+        self.assertEqual(comun.cui_tolerant("RO 123456"), ("123456", False))
+        self.assertEqual(comun.mw_tolerant("45,5"), (45.5, False))
+        self.assertEqual(comun.mw_tolerant("HSA0.69"), (0.69, True))
+        self.assertEqual(comun.mw_tolerant("3S2R1L7).16"), (None, True))
+        self.assertEqual(str(comun.data("10/21/2025")), "2025-10-21")
+
+    def test_pdf_cu_text_care_trece_peste_celula(self):
+        try:
+            from reportlab.pdfgen import canvas
+        except ImportError:
+            self.skipTest("reportlab nu e instalat")
+        import pdfplumber
+        cale = Path(tempfile.mkdtemp()) / "atr.pdf"
+        c = canvas.Canvas(str(cale), pagesize=(600, 300))
+        xs, ys = [20, 200, 300, 400, 560], [250, 220, 190]
+        for x in xs:
+            c.line(x, ys[-1], x, ys[0])
+        for y in ys:
+            c.line(xs[0], y, xs[-1], y)
+        for x, h in zip(xs, ["Titular", "Judet", "Putere MW", "Data PIF"]):
+            c.drawString(x + 3, 230, h)
+        c.drawString(23, 200, "Exemplu Isalnita Solar")
+        c.drawString(203, 200, "Gorj")
+        c.drawString(215, 201, "Oltenia SA)")          # text vărsat peste celula județului
+        c.drawString(303, 200, "12.5")
+        c.drawString(403, 200, "PIF 2014")
+        c.drawString(403.3, 200, "PIF 2014")            # literă dublată (text îngroșat)
+        c.save()
+        with pdfplumber.open(cale) as doc:
+            tabele = [t for p in doc.pages for t in extrage_atr_pdf.tabele_din_pagina(p)]
+        (rand,) = list(extrage_atr_pdf.randuri_din_tabele(tabele))
+        self.assertEqual(rand["data_pif"], "PIF 2014")
+        self.assertEqual(comun.judete_din_text(rand["judet"]), ["GJ"])
+        shutil.rmtree(cale.parent)
+
+
 @unittest.skipUnless(DSN, "setați TEST_DATABASE_URL ca să rulați testele cu baza de date")
 class TestDetectFirst(unittest.TestCase):
     def setUp(self):
@@ -127,13 +191,54 @@ class TestDetectFirst(unittest.TestCase):
         self.assertEqual(self.unu("SELECT tehnologie FROM atr WHERE numar = '1003'"), ("stocare",))
         self.assertEqual(self.unu("SELECT count(*) FROM companii"), (4,))
 
-    def test_atr_cu_erori_nu_scrie_nimic(self):
+    def test_liniile_nereparabile_se_sar_iar_restul_se_importa(self):
         cale = self.dir / "atr.csv"
         cale.write_text("numar_atr,titular,judet,mw,sursa\n1,Bun SRL,Dolj,10,x\n2,Rău SRL,Atlantida,5,x\n3,Fără MW SRL,DJ,,x\n",
                         encoding="utf-8")
         rez = importa_atr.importa(self.conn, cale)
-        self.assertEqual(len(rez.erori), 2)
+        self.assertEqual((rez.erori, rez.linii, len(rez.respinse)), ([], 1, 2))
+        self.assertEqual(self.unu("SELECT count(*) FROM atr"), (1,))
+        iesire = importa_atr.scrie_respinse(rez, cale)
+        self.assertIn("Atlantida", iesire.read_text(encoding="utf-8"))
+
+    def test_cu_strict_orice_problema_opreste_importul(self):
+        cale = self.dir / "atr.csv"
+        cale.write_text("numar_atr,titular,judet,mw,sursa\n1,Bun SRL,Dolj,10,x\n2,Rău SRL,Atlantida,5,x\n", encoding="utf-8")
+        rez = importa_atr.importa(self.conn, cale, strict=True)
+        self.assertEqual(len(rez.erori), 1)
         self.assertEqual(self.unu("SELECT count(*) FROM atr"), (0,))
+
+    def test_celulele_murdare_din_lista_reala(self):
+        cale = self.dir / "atr.csv"
+        cale.write_text(
+            "numar_atr,data_atr,titular,cui,judet,mw,data_pif,sursa\n"
+            "10,17.05.2023,Alfa Solar SRL,L. 45427207,Dambovta,\"12,5\",PIF estimat la 31.12.2027,x\n"
+            "11,,Beta Energy SRL,SRL21566895,Arad si Timis,40,Pif estimat 2033,x\n"
+            "12,,Gama PV SRL,RO 123456,BBUUCCUURREESSTTII,HSA0.69,PIF/11.04.2012,x\n"
+            ",,Delta Solar SRL,,Timisoara,5,Finalizat cu PIF,x\n"
+            "14,,Epsilon SRL,,Gorj Oltenia S.A.),3S2R1L7).16,Anulat,x\n"
+            "15,10/21/2025,Zeta Solar SRL,,BISTRITA NASAU,7,PIF estimat la 31.06.2026,x\n",
+            encoding="utf-8")
+        rez = importa_atr.importa(self.conn, cale)
+        self.assertEqual(rez.erori, [])
+        self.assertEqual((rez.linii, len(rez.respinse)), (5, 1))
+        self.assertIn("MW", rez.respinse[0]["motiv"])
+        r = dict(zip(["judet", "cui", "mw", "stare", "data_pif", "an", "reparat"], self.unu(
+            "SELECT judet, cui, mw::float8, stare_pif, data_pif::text, an_pif, reparat FROM atr WHERE numar = '10'")))
+        self.assertEqual(r, {"judet": "DB", "cui": "45427207", "mw": 12.5, "stare": "estimat",
+                             "data_pif": "2027-12-31", "an": 2027, "reparat": True})
+        self.assertEqual(self.unu("SELECT judet, judete_secundare, stare_pif, data_pif, an_pif, pif_text FROM atr WHERE numar = '11'"),
+                         ("AR", ["TM"], "estimat", None, 2033, "Pif estimat 2033"))
+        self.assertEqual(self.unu("SELECT judet, mw::float8, stare_pif, an_pif FROM atr WHERE numar = '12'"),
+                         ("B", 0.69, "realizat", 2012))
+        self.assertEqual(self.unu("SELECT judet, stare_pif FROM atr WHERE titular = 'Delta Solar SRL'"), ("TM", "realizat"))
+        self.assertTrue(self.unu("SELECT numar FROM atr WHERE titular = 'Delta Solar SRL'")[0].startswith("fara-numar-"))
+        self.assertEqual(self.unu("SELECT judet, data_atr::text, data_pif::text FROM atr WHERE numar = '15'"),
+                         ("BN", "2025-10-21", "2026-06-30"))
+        # al doilea import: aceleași linii, fără duplicate (și numărul generat e stabil)
+        a_doua = importa_atr.importa(self.conn, cale)
+        self.assertEqual((a_doua.inserate, a_doua.neschimbate), (0, 5))
+        self.assertEqual(self.unu("SELECT stare_pif FROM v_atr WHERE numar = '11'"), ("estimat",))
 
     # --- detecții ---
 

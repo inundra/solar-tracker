@@ -61,7 +61,29 @@ Toate importurile validează întâi fișierul și, la orice eroare, nu scriu ni
 
 ## Lista ATR a Guvernului
 
-PDF-ul: <https://gov.ro/fisiere/stiri_fisiere/Lista_titularilor_care_detin_ATR.pdf> (aprilie–mai 2026, date de la Transelectrica). `extrage_atr_pdf.py` recunoaște tabelul după antet (titular, CUI, județ, MW, operator, etapă, PIF), indiferent de ordinea coloanelor, și desparte „Nr. și dată ATR” dacă sunt în aceeași celulă. Verificați câteva linii din CSV cu PDF-ul înainte de import. PDF-ul nu intră în repo; CSV-ul da, în `date_brute/`.
+PDF-ul: <https://gov.ro/fisiere/stiri_fisiere/Lista_titularilor_care_detin_ATR.pdf> (aprilie–mai 2026, date de la Transelectrica).
+
+```bash
+python backend/src/migreaza.py                       # aplică și migrarea 003 (coloanele PIF)
+python backend/src/extrage_atr_pdf.py Lista_titularilor_care_detin_ATR.pdf backend/date_brute/atr_guvern_2026.csv
+python backend/src/importa_atr.py backend/date_brute/atr_guvern_2026.csv --verifica   # simulare
+python backend/src/importa_atr.py backend/date_brute/atr_guvern_2026.csv
+```
+
+`extrage_atr_pdf.py` recunoaște tabelul după antet (titular, CUI, județ, MW, operator, etapă, PIF), indiferent de ordinea coloanelor, desparte „Nr. și dată ATR” dacă sunt în aceeași celulă, păstrează textul care trece peste marginea celulei întreg (fără litere amestecate între coloane) și scoate literele dublate.
+
+Lista are celule scrise în multe feluri, așa că `importa_atr.py` repară ce se poate și sare doar ce nu se poate citi:
+
+| În listă | În bază |
+|---|---|
+| „PIF estimat la 31.12.2027”, „Pif estimat 2033”, „PIF/11.04.2012”, „Finalizat cu PIF”, „Anulat” | textul în `pif_text`; `stare_pif` (estimat / realizat / anulat / retehnologizat), `data_pif`, `an_pif` |
+| „Dambovta”, „BISTRITA NASAU”, „Caraș – Severin”, „Timisoara”, „BBUUCCUURREESSTTII” | codul județului (DB, BN, CS, TM, B) |
+| „Arad si Timis”, „Dâmbovița, Ilfov” | primul județ în `judet`, restul în `judete_secundare` |
+| CUI „L. 45427207”, „SRL21566895” | `45427207`, `21566895` (`reparat` = true, sursa în `note`) |
+| fără număr ATR | `fara-numar-<hash>`, stabil între rulări |
+| MW ilizibil („3S2R1L7).16”), județ necunoscut | linia e sărită și scrisă în `atr_guvern_2026_respinse.csv`, cu motivul |
+
+Corecturile se văd cu `--detalii`. Cu `--strict`, orice linie cu probleme oprește tot importul. Verificați câteva linii din CSV cu PDF-ul; PDF-ul nu intră în repo, CSV-ul da, în `date_brute/`.
 
 ## Legarea detecțiilor de ATR-uri
 

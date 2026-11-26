@@ -1,6 +1,6 @@
 # Schema bazei de date
 
-**Versiune:** 002 (26 noiembrie 2026) · Issue: #13, #16 · SQL: [`001_schema_initiala.sql`](sql/migrari/001_schema_initiala.sql), [`002_detect_first.sql`](sql/migrari/002_detect_first.sql)
+**Versiune:** 003 (26 noiembrie 2026) · Issue: #13, #16 · SQL: [`001_schema_initiala.sql`](sql/migrari/001_schema_initiala.sql), [`002_detect_first.sql`](sql/migrari/002_detect_first.sql), [`003_atr_pif.sql`](sql/migrari/003_atr_pif.sql)
 
 PostgreSQL 16 + PostGIS 3. Toate geometriile sunt în WGS84 (EPSG:4326). Formatul CSV-urilor de la Setul de adevăr e în [`validare/schema_csv.md`](../validare/schema_csv.md) (#14).
 
@@ -117,6 +117,10 @@ judete ◄── atr ──► companii (cui)          parcuri (setul de adevăr
 | `tehnologie` | text | `fotovoltaic`, `stocare`, `hibrid`, `eolian`, `alta`, `necunoscuta`; ghicită din titular dacă lipsește |
 | `localitate` | text | completată manual (APM, primării) sau din detecția confirmată |
 | `sursa` | text | URL-ul listei sau al documentului |
+| `pif_text` | text | celula PIF exact cum e în listă (migrarea 003) |
+| `stare_pif`, `an_pif` | text, an | `estimat`, `realizat`, `anulat`, `retehnologizat`, `necunoscut`; anul, chiar și fără dată completă |
+| `judete_secundare` | text[] | celelalte județe, pentru ATR-urile pe mai multe județe |
+| `reparat` | bool | o celulă a fost corectată la import (detaliile în `note`) |
 
 CSV-ul de intrare pentru `importa_atr.py`: `numar_atr, data_atr, titular, cui, judet, mw, operator, etapa, data_pif, tehnologie, localitate, sursa, note`. Obligatorii: `numar_atr`, `titular`, `judet`, `mw`. Exemplu: [`date_brute/exemplu_atr.csv`](date_brute/exemplu_atr.csv). Din PDF-ul Guvernului se obține cu `extrage_atr_pdf.py`.
 
@@ -181,6 +185,6 @@ Valorile sunt aproximări de pornire; echipa de validare le poate corecta pe par
 
 ## Ce urmează
 
-CfD și tranzacțiile, legate de `companii` și `atr`, într-o migrare `003_...`.
+CfD și tranzacțiile, legate de `companii` și `atr`, într-o migrare `004_...`.
 
-Schema se schimbă doar printr-o migrare nouă (`003_...sql`); migrările deja aplicate nu se editează.
+Schema se schimbă doar printr-o migrare nouă (`004_...sql`); migrările deja aplicate nu se editează.

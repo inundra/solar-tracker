@@ -3,5 +3,6 @@ fastapi>=0.110
 uvicorn>=0.29
 # doar pentru extrage_atr_pdf.py (PDF-ul Guvernului cu ATR-uri):
 pdfplumber>=0.11
-# doar pentru teste (TestClient din FastAPI):
+# doar pentru teste (TestClient din FastAPI; reportlab face PDF-ul de probă):
 httpx>=0.27
+reportlab>=4
