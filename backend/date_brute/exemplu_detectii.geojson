@@ -1,0 +1,149 @@
+{
+ "type": "FeatureCollection",
+ "name": "exemplu_detectii (valori inventate)",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       23.6965,
+       44.3865
+      ],
+      [
+       23.7035,
+       44.3865
+      ],
+      [
+       23.7035,
+       44.3935
+      ],
+      [
+       23.6965,
+       44.3935
+      ],
+      [
+       23.6965,
+       44.3865
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "detectie_id": "DJ-EX-0001",
+    "sursa": "pipeline",
+    "judet": "DJ",
+    "uat": "Ișalnița",
+    "stadiu_curent": "panouri",
+    "incredere": 0.8,
+    "versiune_pipeline": "v0.1",
+    "jurnal": [
+     {
+      "data_imagine": "2025-02-11",
+      "stadiu": "teren_gol",
+      "sursa_imagine": "sentinel-2",
+      "id_imagine": "S2A_MSIL2A_20250211_EXEMPLU",
+      "tile": "T34TFQ",
+      "cer_senin": 0.93
+     },
+     {
+      "data_imagine": "2025-05-02",
+      "stadiu": "santier",
+      "sursa_imagine": "sentinel-2",
+      "id_imagine": "S2B_MSIL2A_20250502_EXEMPLU",
+      "tile": "T34TFQ",
+      "cer_senin": 0.88
+     },
+     {
+      "data_imagine": "2025-09-19",
+      "stadiu": "panouri",
+      "sursa_imagine": "sentinel-2",
+      "id_imagine": "S2A_MSIL2A_20250919_EXEMPLU",
+      "tile": "T34TFQ",
+      "cer_senin": 0.97,
+      "suprafata_ha": 21.4
+     }
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       23.948,
+       44.098
+      ],
+      [
+       23.951999999999998,
+       44.098
+      ],
+      [
+       23.951999999999998,
+       44.102000000000004
+      ],
+      [
+       23.948,
+       44.102000000000004
+      ],
+      [
+       23.948,
+       44.098
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "detectie_id": "DJ-EX-0002",
+    "sursa": "pipeline",
+    "judet": "DJ",
+    "stadiu_curent": "santier",
+    "data_stadiu": "2025-10-03",
+    "data_defrisare": "2025-08-14",
+    "versiune_pipeline": "v0.1"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       23.096,
+       44.946000000000005
+      ],
+      [
+       23.104000000000003,
+       44.946000000000005
+      ],
+      [
+       23.104000000000003,
+       44.954
+      ],
+      [
+       23.096,
+       44.954
+      ],
+      [
+       23.096,
+       44.946000000000005
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "detectie_id": "GJ-EX-0001",
+    "sursa": "tz-sam",
+    "judet": "GJ",
+    "uat": "Tismana",
+    "stadiu_curent": "gata",
+    "data_stadiu": "2024-06-30"
+   }
+  }
+ ]
+}
